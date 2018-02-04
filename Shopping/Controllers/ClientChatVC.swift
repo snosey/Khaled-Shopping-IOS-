@@ -182,6 +182,45 @@ class ClientChatVC: UIViewController {
             self.dismiss(animated: false, completion: nil)
         }
     
+    @IBAction func fullScreenImageView(_ sender: UIButton) {
+        
+        if let cellView = sender.superview {
+            let cell = cellView.superview?.superview as! UITableViewCell
+            
+            let imgView = cell.viewWithTag(5) as! UIImageView
+            
+            let fullScreenVC = Initializer.createViewControllerWithId(storyBoardId: "FullScreenVC") as! FullScreenVC
+            
+            fullScreenVC.modalPresentationStyle = .overCurrentContext
+            fullScreenVC.image = imgView.image
+            
+            self.present(fullScreenVC, animated: false, completion: nil)
+            
+        
+        }
+        
+    }
+    
+    @IBAction func fullScreenReciever(_ sender: UIButton) {
+        
+        if let cellView = sender.superview {
+            let cell = cellView.superview?.superview?.superview as! UITableViewCell
+            
+            let imgView = cell.viewWithTag(5) as! UIImageView
+            
+            let fullScreenVC = Initializer.createViewControllerWithId(storyBoardId: "FullScreenVC") as! FullScreenVC
+            
+            fullScreenVC.modalPresentationStyle = .overCurrentContext
+            fullScreenVC.image = imgView.image
+            
+            self.present(fullScreenVC, animated: false, completion: nil)
+            
+            
+        }
+        
+    }
+    
+    
     
 }
 
@@ -189,12 +228,16 @@ extension ClientChatVC: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
     
-        return 150
+        return 150.0
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        
 
+        if checkIfMessageImage(tableData[indexPath.row].message) {
+            
+            return 150.0
+        }
+        
         return UITableViewAutomaticDimension
     }
 
@@ -243,18 +286,10 @@ extension ClientChatVC: UITableViewDataSource {
             } else if let cell = tableView.dequeueReusableCell(withIdentifier: "senderImageCell"){
                 
                 let imageView = cell.viewWithTag(5) as! UIImageView
-                
-                let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.tapHandler(_:_:)))
-                
-                imageView.addGestureRecognizer(tapGestureRecognizer)
-                
-                imageView.isUserInteractionEnabled = true
-
+            
                 imageView.sd_setImage(with: URL(string: Helper.removeSpaceFromString(("\(Constants.Services.imagePath)\(tableData[indexPath.row].message)"))), placeholderImage: UIImage(named: "loading")!)
                 
-                imageView.sizeToFit()
-                cell.sizeToFit()
-                
+            
                 Helper.roundCorners(view: imageView, cornerRadius: 5.0)
              
                 return cell
