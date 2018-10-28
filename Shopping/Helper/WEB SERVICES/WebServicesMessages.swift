@@ -20,15 +20,16 @@ extension WebServices {
             "id" : UserStatus.clientID
         ]
 
-        RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
+        // RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
 
+        activityIndicatorView.startAnimation()
         
         Alamofire.request(Constants.Services.inboxMessages, method: .get, parameters: parameters, encoding: URLEncoding.default, headers: nil)
         
         
             .responseJSON { (response) in
                 
-                RappleActivityIndicatorView.stopAnimation()
+                activityIndicatorView.stopAnimation()
                 
                 switch(response.result) {
                 case .failure(let err) :
@@ -59,15 +60,16 @@ extension WebServices {
             "id_sent" : UserStatus.clientID
         ]
         
-        RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
+        // RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
         
+        activityIndicatorView.startAnimation()
         
         Alamofire.request(Constants.Services.getChat, method: .get, parameters: parameters, encoding: URLEncoding.default, headers: nil)
         
         
         
             .responseJSON { (response) in
-                RappleActivityIndicatorView.stopAnimation()
+                activityIndicatorView.stopAnimation()
                 
                 switch(response.result) {
                     
@@ -136,15 +138,16 @@ extension WebServices {
             "id_product" : productID
         ]
         
-        RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
+        // RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
         
+        activityIndicatorView.startAnimation()
         
         Alamofire.request(Constants.Services.addMessage , method: .get, parameters: parameters, encoding: URLEncoding.default, headers: nil)
         
 
             .responseJSON { (response) in
                 
-                RappleActivityIndicatorView.stopAnimation()
+                activityIndicatorView.stopAnimation()
                 
                 switch(response.result) {
                     

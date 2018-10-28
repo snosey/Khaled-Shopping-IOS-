@@ -58,7 +58,8 @@ class ProductProfileVC: UIViewController {
     @IBOutlet weak var collectionViewHeight: NSLayoutConstraint!
 
     @IBOutlet weak var scrollView: UIScrollView!
-    
+    var lastY: CGFloat = 0.0
+
     // MARK: - Variables
     var productDetails: ProductDetails?
     var productID = ""
@@ -66,6 +67,21 @@ class ProductProfileVC: UIViewController {
     
     var collectionData: [Product] = [Product]() {
         didSet {
+            
+            print(collectionData.count)
+            
+            let width = collectionView.frame.width / 2.0
+            let const = membersItem.titleColor(for: .normal) == .black ? 1.8 : 2.0
+            let numberOfCells = (collectionData.count / 2 + collectionData.count % 2 )
+            
+            print(numberOfCells)
+            print(width)
+            print(const)
+            
+            
+            
+            collectionViewHeight.constant = CGFloat(width) * CGFloat(const) * CGFloat(numberOfCells)
+            
             collectionView.reloadData()
         }
     }
@@ -80,16 +96,25 @@ class ProductProfileVC: UIViewController {
         print(client_id_of_owner)
         
 
-        
+        collectionView.bounces = false
         collectionViewHeight.constant = 400.0
 
         membersItem.setTitleColor(UIColor.black , for: .normal)
         similarItem.setTitleColor(UIColor.lightGray, for: .normal)
         
-
+        scrollView.delegate  = self
+        
+        // self.navigationController?.interactivePopGestureRecognizer?.delegate = self
 
     }
     
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        
+        
+        
+        loadMoreProduct(Int((collectionView.indexPath(for: collectionView.visibleCells.last!)?.row)!))
+        
+    }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
@@ -98,7 +123,7 @@ class ProductProfileVC: UIViewController {
         if UserStatus.clientID == client_id_of_owner {
             
             MessageSeller.setTitle("Edit Item", for: .normal)
-            MessageSeller.backgroundColor = UIColor(hexString: "#F93A31")
+            MessageSeller.backgroundColor = UIColor(hexString: "#65103C")
         }
         
         collectionView.register(UINib(nibName: "ProductCell", bundle: nil), forCellWithReuseIdentifier: "ShowProductCell")
@@ -165,7 +190,7 @@ class ProductProfileVC: UIViewController {
                 print("DONE")
                 self.collectionData = products!
             } else {
-                Helper.showErrorMessage("Error , Please try again!2222222", showOnTop: false)
+                Helper.showErrorMessage("Error , Please try again!", showOnTop: false)
             }
         }
 
@@ -348,7 +373,10 @@ class ProductProfileVC: UIViewController {
         WebServices.limitSimilarProduct = 0
 
         
+        //self.navidismiss(animated: false, completion: nil)
         self.dismiss(animated: false, completion: nil)
+        
+        //self.navigationController?.popViewController(animated: true)
         
     }
     
@@ -420,6 +448,14 @@ class ProductProfileVC: UIViewController {
     }
     
     @IBAction func isLoveAction(_ sender: UIButton) {
+        
+        guard UserStatus.clientID != productDetails!.id_client else {
+            
+            Helper.showWarning("You can make your item as a favourite!", showOnTop: false)
+            
+            return
+        }
+        
         
         var state = "remove"
         if sender.image(for: .normal) == UIImage(named: "ic_love") {
@@ -556,13 +592,31 @@ class ProductProfileVC: UIViewController {
 
 extension ProductProfileVC: UICollectionViewDelegateFlowLayout {
     
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        
+        let currentY = scrollView.contentOffset.y
+        let currentBottomY = scrollView.frame.size.height + currentY
+        if currentY > lastY {
+            //"scrolling down"
+            collectionView.bounces = true
+        } else {
+            //"scrolling up"
+            // Check that we are not in bottom bounce
+            if currentBottomY < scrollView.contentSize.height + scrollView.contentInset.bottom {
+                collectionView.bounces = false
+            }
+        }
+        lastY = scrollView.contentOffset.y
+
+    }
+    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         
-        var width = (UIScreen.main.bounds.width - 20.0) / 2
-        
+        var width = (self.collectionView.frame.width - 8.0) / 2
+
         width = width > 200.0 ? 200.0 : width
         
-        let const: CGFloat = (membersItem.titleColor(for: .normal) == .black ? 1.5 : 1.8)
+        let const: CGFloat = (membersItem.titleColor(for: .normal) == .black ? 1.8 : 2.0)
         
         return CGSize(width: width, height: (width * const))
     }
@@ -618,7 +672,9 @@ extension ProductProfileVC: UICollectionViewDataSource {
 
             firstVC.client_id_of_owner = self.collectionData[indexPath.row].id_client
             
-            self.present(ProductNav, animated: false, completion: nil)
+            self.present(ProductNav , animated: false , completion: nil)
+            
+            // self.navigationController?.pushViewController(firstVC, animated: true)
         }
     }
 }

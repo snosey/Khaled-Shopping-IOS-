@@ -10,6 +10,7 @@ import Foundation
 import Alamofire
 import SwiftyJSON
 import RappleProgressHUD
+import NVActivityIndicatorView
 
 extension WebServices {
     
@@ -23,14 +24,19 @@ extension WebServices {
         
         limit += 20
         
-        RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
+        // RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
+        
+        
+        activityIndicatorView.startAnimation()
         
         Alamofire.request(Constants.Services.getAllProduct, method: .get, parameters: parameters, encoding: URLEncoding.default, headers: nil)
 
         
             .responseJSON { (response) in
                 
-                RappleActivityIndicatorView.stopAnimation()
+                // RappleActivityIndicatorView.stopAnimation()
+
+                activityIndicatorView.stopAnimation()
                 
                 switch(response.result) {
                     
@@ -65,14 +71,16 @@ extension WebServices {
             "state" : state
         ]
         
-        RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
+        // RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
+        
+        activityIndicatorView.startAnimation()
 
         Alamofire.request(Constants.Services.updateLove, method: .get, parameters: parameters, encoding: URLEncoding.default, headers: nil)
         
         
             .responseJSON { (response) in
                 
-            RappleActivityIndicatorView.stopAnimation()
+            activityIndicatorView.stopAnimation()
                 
                 switch(response.result) {
                     
@@ -108,14 +116,16 @@ extension WebServices {
             
         ]
         
-        RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
+        // RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
 
+        activityIndicatorView.startAnimation()
+        
         Alamofire.request(Constants.Services.productSearch, method: .get , parameters: parameters, encoding: URLEncoding.default, headers: nil)
         
         
             .responseJSON { (response) in
                 
-                RappleActivityIndicatorView.stopAnimation()
+                activityIndicatorView.stopAnimation()
                 
                 switch(response.result) {
                     
@@ -161,20 +171,23 @@ extension WebServices {
             "id_color2" : filter.id_color2 ,
             "id_government" : filter.id_government ,
             "id_city" : filter.id_city ,
-            "user_id" : UserStatus.clientID
+            "user_id" : UserStatus.clientID ,
+            "swap" : filter.swap
             
         ]
         
         limitFilter += 20
         
         
-        RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
+        // RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
 
+        activityIndicatorView.startAnimation()
+        
         Alamofire.request(Constants.Services.productAllSearch, method: .get, parameters: parameters, encoding: URLEncoding.default, headers: nil)
         
             .responseJSON { (response) in
                 
-                RappleActivityIndicatorView.stopAnimation()
+                activityIndicatorView.stopAnimation()
                 
                 switch(response.result) {
                     

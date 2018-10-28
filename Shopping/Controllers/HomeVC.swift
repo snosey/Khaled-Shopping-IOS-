@@ -8,11 +8,18 @@
 
 import UIKit
 import SkyFloatingLabelTextField
+import NVActivityIndicatorView
+import DropDown
 
 class HomeVC: UIViewController {
 
     // MARK: - Outlets
     @IBOutlet weak var collectionView: UICollectionView!
+    // @IBOutlet weak var sortView: UIView!
+    
+    @IBOutlet weak var emptyView: UIView!
+    
+    var data = [Product]() , isSelected = false , selectedIndex = 0
     
     var collectionData = [Product]() {
         didSet {
@@ -32,11 +39,13 @@ class HomeVC: UIViewController {
     var isLoading = false , lastCellIndex = -1 , isSearching = false // First
     var filterIsLoading = false , filter = Filter()
     
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
         searchBar.delegate = self
         
+        self.hideKeyboardWhenTappedAround()
         
         NotificationCenter.default.addObserver(self, selector: #selector(getProductFilter(_:)), name: NSNotification.Name(rawValue: "getProductFilter"), object: nil)
 
@@ -44,6 +53,8 @@ class HomeVC: UIViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
+        if collectionData.count > 0 && filterIsLoading == false { return }
         
         isLoading = false
         lastCellIndex = -1
@@ -55,6 +66,7 @@ class HomeVC: UIViewController {
         WebServices.limitClientProduct = 0
         WebServices.limitSimilarProduct = 0
         WebServices.limitFilter = 0
+        
         
         collectionData.removeAll()
         collectionView.addSubview(refresher)
@@ -102,6 +114,7 @@ class HomeVC: UIViewController {
         self.filterIsLoading = val.0
         self.filter = val.1
         
+        
     }
     
     @objc func loadMoreProduct(_ cellIndex: Int) {
@@ -113,15 +126,23 @@ class HomeVC: UIViewController {
         
         isLoading = true
         lastCellIndex = cellIndex
+        
+        
         if filterIsLoading {
-            
             
             WebServices.filterProduct(filter: filter, completion: { (success, products) in
                 
                 self.isLoading = false
-                
                 if success {
                     self.collectionData.append(contentsOf: products!)
+                    self.data.append(contentsOf: products!)
+                    
+                    if self.collectionData.count == 0 {
+                        self.emptyView.isHidden = false
+                    } else {
+                        self.emptyView.isHidden = true
+                    }
+                    
                 } else {
                     Helper.showErrorMessage("Error While loading Products", showOnTop: false)
                 }
@@ -130,12 +151,22 @@ class HomeVC: UIViewController {
             return
         }
         
+
         WebServices.getAllProduct { (success, products) in
             
             self.isLoading = false
             
             if success {
                 self.collectionData.append(contentsOf: products!)
+                self.data.append(contentsOf: products!)
+                
+                
+                
+                if self.collectionData.count == 0 {
+                    self.emptyView.isHidden = false
+                } else {
+                    self.emptyView.isHidden = true
+                }
                 
             } else {
                 
@@ -153,7 +184,7 @@ class HomeVC: UIViewController {
     
     }
     
-    @IBAction func searchFilter(_ sender: UIBarButtonItem) {
+    @IBAction func searchFilter(_ sender: UIButton) {
         
         let FilterNav = Initializer.createViewControllerWithId(storyBoardId: "FilterNav") as! UINavigationController
         
@@ -162,19 +193,90 @@ class HomeVC: UIViewController {
         
     }
     
+    @IBAction func sortBTN(_ sender: UIButton) {
+        
+        let drop = DropDown()
+        drop.anchorView = sender
+        
+        drop.dataSource = ["newest" , "Price: low to high" , "Price: high to low"]
+        
+        drop.cellNib = UINib(nibName: "sortCell", bundle: nil)
+        
 
+        drop.cellHeight = 50.0
+        
+        drop.customCellConfiguration = { [unowned self] (index: Index, item: String, cell: DropDownCell) -> Void in
+            
+            guard let myCell = cell as? sortCell else { return }
+            
+            myCell.cellText.text = item
+            
+            if self.selectedIndex == index {
+                myCell.selectedCell = true
+            }
+
+        }
+        
+        
+        drop.selectionAction = { [unowned self] (index: Int, item: String) in
+            print("Selected item: \(item) at index: \(index)")
+            
+            self.selectedIndex = index
+            
+            drop.hide()
+            
+            // Execute Some
+            
+            if index == 0 {
+                self.collectionData = self.data
+            } else if index == 1 {
+                self.collectionData = self.collectionData.sorted { (productA, productB) -> Bool in
+                    
+                    return Double(productA.price)! <= Double(productB.price)!
+                }
+            } else if index == 2 {
+                self.collectionData = self.collectionData.sorted { (productA, productB) -> Bool in
+                    
+                    return Double(productA.price)! >= Double(productB.price)!
+                }
+            }
+            
+            
+        }
+        
+        
+        drop.show()
+        
+
+        
+        
+
+        
+        
+//        if let tv = sortView.viewWithTag(5) as? UITableView {
+//
+//            sortView.isHidden = false
+//            tv.delegate = self
+//            tv.dataSource = self
+//            tv.reloadData()
+//        }
+//
+    }
+    
+    
 }
+
 
 extension HomeVC: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         
-        var width = (UIScreen.main.bounds.width - 20.0) / 2
+        var width = (self.collectionView.frame.width - 5) / 2
         
         width = width > 200.0 ? 200.0 : width
         
         
-        return CGSize(width: width, height: width * 1.8)
+        return CGSize(width: width, height: width * 2.0)
     }
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
@@ -190,6 +292,7 @@ extension HomeVC: UICollectionViewDelegateFlowLayout {
 
 extension HomeVC: UICollectionViewDataSource {
     
+   
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return 1
     }
@@ -215,21 +318,23 @@ extension HomeVC: UICollectionViewDataSource {
         
         
         if let firstVC = ProductNav.viewControllers[0] as? ProductProfileVC {
-            
+
             // to insure that productDetails is come with nil
             firstVC.productID = self.collectionData[indexPath.row].id
             firstVC.client_id_of_owner = self.collectionData[indexPath.row].id_client
+            
+            self.present(ProductNav , animated: false , completion: nil)
 
-            self.present(ProductNav, animated: false, completion: nil)
+            // self.navigationController?.pushViewController(firstVC, animated: true)
         }
     }
 }
 
 extension HomeVC: UISearchBarDelegate {
     
-    
     func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
-    
+
+
         if searchBar.text != "" && isSearching == false {
                 
                 isSearching = true
@@ -237,7 +342,15 @@ extension HomeVC: UISearchBarDelegate {
             WebServices.SearchText(text: searchBar.text!, completion: { (success, products) in
                     
                 if success {
+                    
                     self.collectionData = products!
+                    
+                    if self.collectionData.count == 0 {
+                        self.emptyView.isHidden = false
+                    } else {
+                        self.emptyView.isHidden = true
+                    }
+                    
                     self.isSearching = false
                 } else {
                     Helper.showErrorMessage("Error While loading products!", showOnTop: false)
@@ -248,6 +361,8 @@ extension HomeVC: UISearchBarDelegate {
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         
+        self.tabBarController?.view.endEditing(true)
+
         if searchBar.text != "" && isSearching == false {
             
             isSearching = true
@@ -257,6 +372,13 @@ extension HomeVC: UISearchBarDelegate {
                 if success {
                     self.collectionData = products!
                     self.isSearching = false
+                    
+                    if self.collectionData.count == 0 {
+                        self.emptyView.isHidden = false
+                    } else {
+                        self.emptyView.isHidden = true
+                    }
+                    
                 } else {
                     Helper.showErrorMessage("Error While loading products!", showOnTop: false)
                 }
@@ -265,6 +387,8 @@ extension HomeVC: UISearchBarDelegate {
     }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+
+        self.tabBarController?.view.endEditing(true)
 
         navigationItem.titleView = nil
 

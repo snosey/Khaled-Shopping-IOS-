@@ -23,7 +23,7 @@ class AddProduct {
     var id_brand = ""
     var id_size = "36"
     var id_condition_state = ""
-    var id_city = ""
+    var id_city = "-1"
     var id_government = ""
     var id_color1 = ""
     var id_color2 = ""

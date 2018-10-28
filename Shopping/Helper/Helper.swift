@@ -9,10 +9,13 @@
 import Foundation
 import UIKit
 import Dodo
+import NVActivityIndicatorView
 
 class Helper: NSObject {
     
     static let appDelegate = UIApplication.shared.delegate as! AppDelegate
+    
+    static var activityIndicator = NVActivityIndicatorView(frame: CGRect.init(x: 0, y: 0, width: 0, height: 0))
     
     class func roundCorners(view: UIView , cornerRadius: CGFloat , borderWidth: CGFloat = 0.0 , borderColor: UIColor = .clear) {
         
@@ -111,12 +114,27 @@ class Helper: NSObject {
 
     }
     
+    class func StartAnimation(_ view: UIView) {
+        
+        let rect = CGRect(x: view.bounds.midX - 20.0, y: view.bounds.midY - 20.0, width: 40.0, height: 40.0)
+        
+        let activityIndicator = NVActivityIndicatorView(frame: rect, type: NVActivityIndicatorType.ballPulseSync, color: .black, padding: 0.0)
+        
+        activityIndicator.backgroundColor = .clear
+        
+        
+        view.addSubview(activityIndicator)
+        
+        activityIndicator.startAnimating()
+        
+    }
     
+
     class func makeUIViewShadow(containerView: UIView) {
         containerView.layer.shadowColor = UIColor.black.cgColor
-        containerView.layer.shadowOpacity =  0.09
+        containerView.layer.shadowOpacity =  0.25
         containerView.layer.shadowOffset = .zero
-        containerView.layer.shadowRadius = 20.0
+        containerView.layer.shadowRadius = 10.0
         containerView.layer.shadowPath = UIBezierPath(rect: containerView.bounds).cgPath
         containerView.layer.shouldRasterize = true
     }
@@ -137,6 +155,15 @@ class Helper: NSObject {
         return returnedString
     }
 
+    class func differentInSecond(_ date1: Date , _ date2: Date) -> Int {
+        
+        let components = Calendar.current.dateComponents([.second], from: date1, to: date2)
+
+        print(components.second!)
+        
+        
+        return components.second!
+    }
     
     class func getDay(_ dateForm: String) -> String {
         

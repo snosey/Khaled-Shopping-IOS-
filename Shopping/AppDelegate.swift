@@ -11,11 +11,12 @@ import CoreData
 import FBSDKCoreKit
 import Firebase
 import FirebaseMessaging
-import Google
 import FirebaseInstanceID
 import IQKeyboardManagerSwift
 import UserNotifications
 import SwiftyJSON
+import GoogleSignIn
+import Google
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -97,7 +98,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         GIDSignIn.sharedInstance().clientID = kClient
         var configureError:NSError?
         GGLContext.sharedInstance().configureWithError(&configureError)
-        
         
         
         // Handle IQKeyboardManagerSwift

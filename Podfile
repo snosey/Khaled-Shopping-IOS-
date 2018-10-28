@@ -7,6 +7,8 @@ target 'Shopping' do
   
 
   # Pods for Shopping
+  #  pod 'Google/SignIn'
+  #  pod 'GoogleSignIn'
   
   pod 'Alamofire'
   pod 'SwiftyJSON'
@@ -17,15 +19,18 @@ target 'Shopping' do
   pod 'Dodo', '~> 9.0'
   pod 'RappleProgressHUD'
   pod 'Firebase'
-  pod 'Google/SignIn'
   pod 'SDWebImage/WebP'
   pod 'OpalImagePicker', '~> 1.4.0'
   pod 'ImageSlideshow/Kingfisher'
   pod 'AlamofireImage', '~> 3.3'
-  pod 'SwiftRangeSlider'
+  pod "WARangeSlider"
   pod 'Firebase/Core'
   pod 'Firebase/Messaging'
+  pod 'Google/SignIn'
+  pod 'NVActivityIndicatorView'
+  pod 'DropDown'
 
+  
   target 'ShoppingTests' do
     inherit! :search_paths
     # Pods for testing
@@ -35,6 +40,13 @@ target 'Shopping' do
     inherit! :search_paths
     # Pods for testing
   end
- 
+  
+  post_install do |installer|
+      installer.pods_project.build_configurations.each do |config|
+          config.build_settings.delete('CODE_SIGNING_ALLOWED')
+          config.build_settings.delete('CODE_SIGNING_REQUIRED')
+      end
+  end
+
 
 end

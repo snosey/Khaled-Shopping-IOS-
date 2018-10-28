@@ -97,7 +97,22 @@ extension ChooseOtherVC: UITableViewDelegate {
                         }
                     }
                 }
+                
+                if tableData.count == 0 {
+                    
+                    
+                    let obj = ("" , "" , "\(type)" , currentGovernment , "")
+                    
+                    NotificationCenter.default.post(name: NSNotification.Name(rawValue: "getFilterTypes") , object: obj, userInfo: nil)
+                    
+                    
+                    self.dismiss(animated: false, completion: nil)
+
+                    
+                }
+                
             }
+            
             flag = false
             type = 7
             

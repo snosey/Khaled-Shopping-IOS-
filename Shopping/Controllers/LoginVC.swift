@@ -18,6 +18,7 @@ class LoginVC: UIViewController {
     @IBOutlet weak var email: SkyFloatingLabelTextField!
     @IBOutlet weak var sendInfoButton: UIButton!
     
+    @IBOutlet weak var emailImage: UIImageView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -34,6 +35,8 @@ class LoginVC: UIViewController {
     }
     
     func setupView() {
+
+        
         let gestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(LoginVC.dismissLoginVC))
         
         self.dismissView.addGestureRecognizer(gestureRecognizer)
@@ -49,9 +52,12 @@ class LoginVC: UIViewController {
         
         email.isHidden = false
         sendInfoButton.isHidden = false
+        emailImage.isHidden = false
         
     }
+    
     @IBAction func SignInAction(_ sender: UIButton) {
+        
         guard let userName = username.text , userName != "" else {
             Helper.showErrorMessage("Please enter username!", showOnTop: false)
             return
@@ -65,7 +71,7 @@ class LoginVC: UIViewController {
         WebServices.login(userName: userName, password: passWord) { (success, Msg) in
             if success == true {
                 
-                Helper.showSucces(Msg!, showOnTop: false)
+                // Helper.showSucces(Msg!, showOnTop: false)
                 
                 self.goToMainHomeVC()
                 

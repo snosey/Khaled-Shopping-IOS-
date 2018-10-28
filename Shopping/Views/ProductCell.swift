@@ -17,10 +17,12 @@ class ProductCell: UICollectionViewCell {
     @IBOutlet weak var profilePic: UIImageView!
     @IBOutlet weak var productImage: UIImageView!
     @IBOutlet weak var price: UILabel!
-    @IBOutlet weak var LoveCount: UILabel!
     @IBOutlet weak var isLoved: UIButton!
     @IBOutlet weak var Brand: UILabel!
     @IBOutlet weak var Size: UILabel!
+    @IBOutlet weak var loveImage: UIImageView!
+    @IBOutlet weak var loveButtonView: UIView!
+    @IBOutlet weak var rotate: UIImageView!
     
     // MARK: - Variables
     var product: Product? {
@@ -33,7 +35,12 @@ class ProductCell: UICollectionViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         
-        Helper.ImageViewCircle(imageView: profilePic, 3.0)
+        Helper.ImageViewCircle(imageView: profilePic, 2.0)
+        
+        // Helper.makeUIViewShadow(containerView: loveButtonView)
+        
+        loveButtonView.layer.applySketchShadow(y: 0 , spread: 2, radius : 15)
+
         
     }
     
@@ -41,14 +48,20 @@ class ProductCell: UICollectionViewCell {
     func updateCellData() {
         
         self.name.text = product!.name
-        self.price.text = "L.E \(product!.price)"
-        self.LoveCount.text = product!.love
+        self.price.text = "\(product!.price) L.E"
         
+        if product!.swap == "1" {
+            
+            rotate.isHidden = false
+            
+        }
     
         if product!.isLove == "true" {
-            self.isLoved.setImage(UIImage(named: "ic_lovefull"), for: .normal)
+            // self.isLoved.setImage(UIImage(named: "ic_lovefull"), for: .normal)
+            loveImage.image = UIImage(named: "ic_lovefull")
         } else {
-            self.isLoved.setImage(UIImage(named: "ic_love"), for: .normal)
+            // self.isLoved.setImage(UIImage(named: "ic_love"), for: .normal)
+            loveImage.image = UIImage(named: "ic_love")
         }
         
         self.Brand.text = product!.brand
@@ -81,23 +94,31 @@ class ProductCell: UICollectionViewCell {
     
     // MARK: - Actions
     @IBAction func LoveAction(_ sender: UIButton) {
+        
+        guard UserStatus.clientID != product!.id_client else {
+            
+            Helper.showWarning("You can make your item as a favourite!", showOnTop: false)
+            
+            return 
+        }
+        
         var state = "remove"
-        if sender.image(for: .normal) == UIImage(named: "ic_love") {
+        
+        if loveImage.image == UIImage(named: "ic_love") {
             state = "add"
         }
         
         WebServices.updateLove(state: state, idProduct: productID) { (success, Msg) in
             
             if success {
-                self.isLoved.setImage(UIImage(named: (state == "remove" ? "ic_love" : "ic_lovefull")), for: .normal)
+                
+                self.loveImage.image = UIImage(named: (state == "remove" ? "ic_love" : "ic_lovefull"))
                 
                 if state == "remove" {
                     self.product!.love = "\(Int(self.product!.love)! - 1)"
                 } else {
                     self.product!.love = "\(Int(self.product!.love)! + 1)"
                 }
-                
-                self.LoveCount.text = self.product!.love
                 
             } else {
                 Helper.showErrorMessage(Msg, showOnTop: false)

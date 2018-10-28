@@ -23,14 +23,16 @@ extension WebServices {
             "id_product" : idProduct
         ]
         
-        RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
+        // RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
 
+        
+        activityIndicatorView.startAnimation()
         
         Alamofire.request(Constants.Services.postComments, method: .get, parameters: parameters, encoding: URLEncoding.default, headers: nil)
         
             .responseJSON { (response) in
                 
-                RappleActivityIndicatorView.stopAnimation()
+                activityIndicatorView.stopAnimation()
                 
                 switch(response.result) {
                     
@@ -62,15 +64,16 @@ extension WebServices {
             "id" : commentID
         ]
         
-        RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
+        // RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
 
+        activityIndicatorView.startAnimation()
         
         Alamofire.request(Constants.Services.deleteComment, method: .get, parameters: parameters, encoding: URLEncoding.default, headers: nil)
         
         
             .responseJSON { (response) in
                 
-                RappleActivityIndicatorView.stopAnimation()
+                activityIndicatorView.stopAnimation()
                 
                 switch(response.result) {
                     
@@ -97,13 +100,15 @@ extension WebServices {
             "id_product" : idProduct
         ]
         
-        RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
+        // RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
+        
+        activityIndicatorView.startAnimation()
         
         Alamofire.request(Constants.Services.getComments, method: .get, parameters: parameters, encoding: URLEncoding.default, headers: nil)
         
             .responseJSON { (response) in
 
-                RappleActivityIndicatorView.stopAnimation()
+                activityIndicatorView.stopAnimation()
 
                 switch(response.result) {
                     

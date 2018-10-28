@@ -9,7 +9,8 @@
 import UIKit
 import FBSDKCoreKit
 import FBSDKLoginKit
-import Google
+import GoogleSignIn
+
 
 
 class ChooseSignUpVC: UIViewController  {
@@ -31,6 +32,7 @@ class ChooseSignUpVC: UIViewController  {
         // GOOGLE LOGIN SDK
         GIDSignIn.sharedInstance().uiDelegate = self
         GIDSignIn.sharedInstance().delegate = self
+        
         
         
 

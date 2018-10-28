@@ -8,42 +8,47 @@
 
 import UIKit
 import SDWebImage
+import SwiftyJSON
 
 class ClientProfileVC: UIViewController {
     
     // MARK: - Outlet
-    @IBOutlet weak var clientPic: UIImageView!
     @IBOutlet weak var collectionView: UICollectionView!
     
-    @IBOutlet weak var followButton: UIButton!
-    @IBOutlet weak var followingNum: UILabel!
-    @IBOutlet weak var followersNum: UILabel!
-    @IBOutlet weak var aboutClient: UILabel!
-    
-    @IBOutlet weak var MessageSellerButton: UIButton!
-    
-    @IBOutlet weak var reviewImageView1: UIImageView!
-    @IBOutlet weak var reviewImageView2: UIImageView!
-    @IBOutlet weak var reviewImageView3: UIImageView!
-    @IBOutlet weak var reviewImageView4: UIImageView!
-    @IBOutlet weak var reviewImageView5: UIImageView!
-    
-    @IBOutlet weak var reviewNumber1: UILabel!
-    @IBOutlet weak var reviewNumber2: UILabel!
-    @IBOutlet weak var reviewNumber3: UILabel!
-    @IBOutlet weak var reviewNumber4: UILabel!
-    @IBOutlet weak var reviewNumber5: UILabel!
-    
-    @IBOutlet weak var notReviewed: UILabel!
-    
     var productOwnerID = "" , isLoading = false , lastCellIndex = -1  , idOfClient = ""
+    
     var data: (String , String , String , String , String , String , String , String , String)?
+    
+    // CollectionView Height WILL BE Dynamic
+    @IBOutlet weak var collectionViewHeight: NSLayoutConstraint!
+    
+    @IBOutlet weak var scrollView: UIScrollView!
+    var lastY: CGFloat = 0.0
+
+    
     // Phone data.2
-    var collectionData = [Product]() {
+    var collectionData: [Product] = [Product]() {
         didSet {
+            
+            print(collectionData.count)
+            
+            let width = collectionView.frame.width / 2.0
+            let const = 1.8
+            let numberOfCells = (collectionData.count / 2 + collectionData.count % 2 )
+            
+            print(numberOfCells)
+            print(width)
+            print(const)
+            
+            
+            
+            collectionViewHeight.constant = CGFloat(width) * CGFloat(const) * CGFloat(numberOfCells)
+            
             collectionView.reloadData()
         }
     }
+    
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -51,16 +56,28 @@ class ClientProfileVC: UIViewController {
         // For Items ( That is not Contain Logo , Name )
         
         print(productOwnerID)
+        scrollView.delegate  = self
+
+        collectionView.register(UINib(nibName: "CellWithNoName", bundle: nil), forCellWithReuseIdentifier: "CellWithNoName")
+
         
         print(idOfClient)
-        
         
 
 
     }
     
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        
+        
+        
+        loadMoreProduct(Int((collectionView.indexPath(for: collectionView.visibleCells.last!)?.row)!))
+        
+    }
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
         
         WebServices.limit = 0
         WebServices.limitSearch = 0
@@ -68,19 +85,22 @@ class ClientProfileVC: UIViewController {
         WebServices.limitClientProduct = 0
         WebServices.limitSimilarProduct = 0
 
-        collectionView.register(UINib(nibName: "CellWithNoName", bundle: nil), forCellWithReuseIdentifier: "CellWithNoName")
-    
+
         WebServices.clientProfileData(id_of_client: productOwnerID, completion: { (success, name, about, phone, logo, follow, followers, review, stars, isFollow) in
             
             if success {
                 
                 self.data = (name! , about! , phone! , logo! , follow! , followers! , review! , stars! , isFollow!)
-
+                
                 self.setupView()
                 
                 self.isLoading = false
                 self.lastCellIndex = -1
                 self.collectionData.removeAll()
+                
+                // let jsonOBject = JSON()
+                
+                // self.collectionData.append(Product(json: jsonOBject))
                 self.loadMoreProduct(0)
 
             } else {
@@ -95,45 +115,71 @@ class ClientProfileVC: UIViewController {
     // MARK: - Methods
     func setupView() {
         
-        //Helper.roundCorners(view: followButton, cornerRadius: 10.0)
         
-        // Helper.roundCorners(view: MessageSellerButton, cornerRadius: 10.0)
+        let profileLogo = self.view.viewWithTag(5) as! UIImageView
+        let followers = self.view.viewWithTag(6) as! UILabel
+        let following = self.view.viewWithTag(7) as! UILabel
+        let followButton = self.view.viewWithTag(8) as! UIButton
+        let notReviewed = self.view.viewWithTag(9) as! UILabel
         
-        // Helper.ImageViewCircle(imageView: clientPic, 2.0)
+        let reviewNumber1 = self.view.viewWithTag(11) as! UILabel
+        
+        
+        let reviewNumber2 = self.view.viewWithTag(12) as! UILabel
+        
+        let reviewNumber3 = self.view.viewWithTag(13) as! UILabel
+        
+        let reviewNumber4 = self.view.viewWithTag(14) as! UILabel
+        
+        let reviewNumber5 = self.view.viewWithTag(15) as! UILabel
+        
+        let reviewImageView1 = self.view.viewWithTag(16) as! UIImageView
+        let reviewImageView2 = self.view.viewWithTag(17) as! UIImageView
+        let reviewImageView3 = self.view.viewWithTag(18) as! UIImageView
+        let reviewImageView4 = self.view.viewWithTag(19) as! UIImageView
+        let reviewImageView5 = self.view.viewWithTag(20) as! UIImageView
         
         
         
-        if Helper.removeSpaceFromString(data!.3) != "" {
-            clientPic.contentMode = .scaleToFill
-        }
+        // if Helper.removeSpaceFromString(data!.3) != "" {
+        //   profileLogo.contentMode = .scaleToFill
+        //  }
         
         // Update Profile Data
-        clientPic.sd_setImage(with: URL(string: Helper.removeSpaceFromString("\(Constants.Services.imagePath)\(data!.3)")), placeholderImage: UIImage(named: "profile"))
+        profileLogo.sd_setImage(with: URL(string: Helper.removeSpaceFromString("\(Constants.Services.imagePath)\(data!.3)")), placeholderImage: UIImage(named: "profile"))
         
-        self.title = data!.0 // as Name of Client
-        aboutClient.text = data!.1 // As about
+        if data?.0.trimmingCharacters(in: .whitespacesAndNewlines) == "" {
+            
+            profileLogo.contentMode = .scaleAspectFit
+        }
+        
+        self.title = data?.0 // as Name of Client
+        
+        // aboutClient.text = data!.1 // As about
         // Phone
         
-        followingNum.text = data!.4
-        followersNum.text = data!.5
+        following.text = data?.4
+        followers.text = data?.5
         
         if idOfClient == UserStatus.clientID {
             
             followButton.setTitle("Edit Profile", for: .normal)
-            followButton.backgroundColor = UIColor(hexString: "FF0000")
+            followButton.backgroundColor = UIColor(hexString: "65103C")
             
         } else {
-        
-            followButton.setTitle( (data!.8 == "false" ? "Follow" : "Following") , for: .normal)
-        
+            
+            followButton.setTitle( (data?.8 == "false" ? "Follow" : "Following") , for: .normal)
+            
         }
         
         ////// REVIEWWWW \\\\\\\\\\\\
-        if data!.7 == "0" {
+        if data?.7 == "0" {
             
             notReviewed.isHidden = false
             
         } else {
+            notReviewed.isHidden = true
+            
             if data!.7[data!.7.startIndex] == "1" {
                 
                 reviewNumber1.text = data!.6
@@ -181,7 +227,10 @@ class ClientProfileVC: UIViewController {
                 reviewImageView5.isHidden = false
                 
             }
+            
         }
+        
+        
     }
     
     
@@ -212,6 +261,7 @@ class ClientProfileVC: UIViewController {
     
     @IBAction func followClient(_ sender: UIButton) {
         
+
         if idOfClient == UserStatus.clientID {
             
             WebServices.getUserInfo { (success, userName , name , phone, logo, about)  in
@@ -239,7 +289,7 @@ class ClientProfileVC: UIViewController {
         
         var state = "remove"
         
-        if followButton.title(for: .normal) == "Follow" {
+        if sender.title(for: .normal) == "Follow" {
             state = "add"
         }
         
@@ -248,10 +298,10 @@ class ClientProfileVC: UIViewController {
                 Helper.showSucces("success", showOnTop: false)
                 
                 if state == "add" {
-                    self.followButton.setTitle("Following", for: .normal)
+                    sender.setTitle("Following", for: .normal)
                     self.data!.8 = "true"
                 } else {
-                    self.followButton.setTitle("Follow", for: .normal)
+                    sender.setTitle("Follow", for: .normal)
                     self.data!.8 = "false"
                 }
                 
@@ -359,14 +409,34 @@ class ClientProfileVC: UIViewController {
 
 extension ClientProfileVC: UICollectionViewDelegateFlowLayout {
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
         
-        var width = (self.collectionView.bounds.width - 20.0) / 2
+        let currentY = scrollView.contentOffset.y
+        let currentBottomY = scrollView.frame.size.height + currentY
+        if currentY > lastY {
+            //"scrolling down"
+            collectionView.bounces = true
+        } else {
+            //"scrolling up"
+            // Check that we are not in bottom bounce
+            if currentBottomY < scrollView.contentSize.height + scrollView.contentInset.bottom {
+                collectionView.bounces = false
+            }
+        }
+        lastY = scrollView.contentOffset.y
+        
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+
+        var width = (self.collectionView.bounds.width - 8.0) / 2.0
+
         
         width = width > 200.0 ? 200.0 : width
         
+
         
-        return CGSize(width: width, height: width * 1.8)
+        return CGSize(width: width, height: (width *  1.8))
     }
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
@@ -392,7 +462,7 @@ extension ClientProfileVC: UICollectionViewDataSource {
     
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        
+
         if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CellWithNoName", for: indexPath) as? CellWithNoName {
             
             cell.product = collectionData[indexPath.row]
@@ -401,6 +471,22 @@ extension ClientProfileVC: UICollectionViewDataSource {
         }
 
         return UICollectionViewCell()
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        
+        let ProductNav = Initializer.createViewControllerWithId(storyBoardId: Constants.StoryBoardID.productProfileNav) as! UINavigationController
+        
+        if let firstVC = ProductNav.viewControllers[0] as? ProductProfileVC {
+            
+            firstVC.productID = self.collectionData[indexPath.row].id
+            
+            firstVC.client_id_of_owner = self.collectionData[indexPath.row].id_client
+            
+            self.present(ProductNav , animated: false , completion: nil)
+            
+            // self.navigationController?.pushViewController(firstVC, animated: true)
+        }
     }
     
 }

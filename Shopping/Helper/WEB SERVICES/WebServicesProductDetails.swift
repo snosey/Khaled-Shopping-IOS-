@@ -13,6 +13,8 @@ import RappleProgressHUD
 
 extension WebServices {
     
+
+    
     class func getProductDetails(_ clientID: String , _ id: String , completion: @escaping (_ success: Bool , _ productDetail: ProductDetails?) -> Void) {
         
         let parameters = [
@@ -20,14 +22,16 @@ extension WebServices {
             "user_id" : UserStatus.clientID
         ]
         
-        RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
+        // RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
+        
+        activityIndicatorView.startAnimation()
         
         Alamofire.request(Constants.Services.productDetails, method: .get, parameters: parameters, encoding: URLEncoding.default, headers: nil)
         
         
             .responseJSON { (response) in
                 
-                RappleActivityIndicatorView.stopAnimation()
+                activityIndicatorView.stopAnimation()
 
                 switch(response.result) {
                     
@@ -89,14 +93,16 @@ extension WebServices {
         
         limitClientProduct += 20
         
-        RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
+        // RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
 
+        
+        activityIndicatorView.startAnimation()
         
         Alamofire.request(Constants.Services.clientProducts, method: .get, parameters: parameters, encoding: URLEncoding.default, headers: nil)
         
             .responseJSON { (response) in
                 
-                RappleActivityIndicatorView.stopAnimation()
+                activityIndicatorView.stopAnimation()
                 
                 switch(response.result) {
                 case .failure(let err) :
@@ -132,14 +138,15 @@ extension WebServices {
             "id_category3" : cat3
         ]
         
-        RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
+        // RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
 
+        activityIndicatorView.startAnimation()
         
         Alamofire.request(Constants.Services.similarProducts, method: .get, parameters: parameters, encoding: URLEncoding.default, headers: nil)
         
             .responseJSON { (response) in
                 
-                RappleActivityIndicatorView.stopAnimation()
+                activityIndicatorView.stopAnimation()
                 
                 switch(response.result) {
                     
@@ -174,14 +181,14 @@ extension WebServices {
         
         limitFavProduct += 20
         
-        RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
-        
+        // RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
+        activityIndicatorView.startAnimation()
         
         Alamofire.request(Constants.Services.productClientLove, method: .get, parameters: parameters, encoding: URLEncoding.default, headers: nil)
             
             .responseJSON { (response) in
                 
-                RappleActivityIndicatorView.stopAnimation()
+                activityIndicatorView.stopAnimation()
                 
                 switch(response.result) {
                 case .failure(let err) :
@@ -212,13 +219,15 @@ extension WebServices {
             "id" : productID
         ]
         
-        RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
+        // RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
+        
+        activityIndicatorView.startAnimation()
         
         Alamofire.request(Constants.Services.deleteProduct, method: .get, parameters: parameters, encoding: URLEncoding.default, headers: nil)
         
             .responseJSON { (response) in
                 
-                RappleActivityIndicatorView.stopAnimation()
+                activityIndicatorView.stopAnimation()
                 
                 switch(response.result) {
                     
@@ -250,13 +259,16 @@ extension WebServices {
             "id" : productID
         ]
         
-        RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
+        // RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
+        
+        
+        activityIndicatorView.startAnimation()
         
         Alamofire.request(Constants.Services.editProductData, method: .get, parameters: parameters, encoding: URLEncoding.default, headers: nil)
             
             .responseJSON { (response) in
                 
-                RappleActivityIndicatorView.stopAnimation()
+                activityIndicatorView.stopAnimation()
                 
                 switch(response.result) {
                     
@@ -302,12 +314,14 @@ extension WebServices {
             "id_city" : product.id_city
         ]
         
-        RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
+        // RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
+        
+        activityIndicatorView.startAnimation()
 
         Alamofire.request(Constants.Services.updateProduct, method: .get, parameters: parameters, encoding: URLEncoding.default, headers: nil)
         
             .responseJSON { (response) in
-                RappleActivityIndicatorView.stopAnimation()
+                activityIndicatorView.stopAnimation()
                 
                 switch(response.result) {
                     

@@ -8,13 +8,13 @@
 
 import UIKit
 import SwiftyJSON
-import SwiftRangeSlider
+import WARangeSlider
 
 class FilterVC: UIViewController {
 
     // MARK: - Outlets
-    @IBOutlet weak var rangeSlider: RangeSlider!
     
+    @IBOutlet weak var sliderRange: RangeSlider!
     @IBOutlet weak var categoryButton: UIButton!
     @IBOutlet weak var categoryTitle: UILabel!
     
@@ -22,13 +22,11 @@ class FilterVC: UIViewController {
     @IBOutlet weak var sizeTitle: UILabel!
     @IBOutlet weak var firstColorTitle: UILabel!
     @IBOutlet weak var secondColorTitle: UILabel!
-    
     @IBOutlet weak var firstColorView: UIView!
     @IBOutlet weak var secondColorView: UIView!
-    
     @IBOutlet weak var conditionTitle: UILabel!
     @IBOutlet weak var locationTitle: UILabel!
-    
+    @IBOutlet weak var swappingIV: UIImageView!
     
     // HIDE IF ////
     @IBOutlet weak var heightSize: NSLayoutConstraint!
@@ -36,6 +34,13 @@ class FilterVC: UIViewController {
     @IBOutlet weak var labelHeightSize: NSLayoutConstraint!
     @IBOutlet weak var sizeView: UIView!
     
+    
+    @IBOutlet weak var minBudgetLabel: UILabel!
+    @IBOutlet weak var maxBudgetLabel: UILabel!
+    
+    
+    @IBOutlet weak var leftAllConst: NSLayoutConstraint!
+    @IBOutlet weak var leftFColorConst: NSLayoutConstraint!
     
     
     /*
@@ -66,17 +71,20 @@ class FilterVC: UIViewController {
     var jsonObjct = JSON()
     var filterData = Filter()
     var sizeKam = 0 // ZERO means hide , ONE means numbers , TWO means مقاسات
+    
+
+    var locationVC = GovernmentVC.storyBoardInstance()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.rangeSlider.updateLayerFramesAndPositions()
+        sliderRange.addTarget(self, action: #selector(rangeSliderValueChanged),
+                              for: .valueChanged)
 
         NotificationCenter.default.addObserver(self, selector: #selector(getThreeCategory(_:)), name: NSNotification.Name(rawValue: "ThreeCategoryFilter"), object: nil)
         
         NotificationCenter.default.addObserver(self, selector: #selector(getOtherTypes(_:)), name: NSNotification.Name(rawValue: "getFilterTypes"), object: nil)
         
-        rangeSlider.addTarget(self, action: #selector(FilterVC.rangeSliderValueChanged), for: .valueChanged)
 
 
         Helper.roundCorners(view: categoryButton, cornerRadius: 10.0)
@@ -93,7 +101,6 @@ class FilterVC: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        self.rangeSlider.updateLayerFramesAndPositions()
         
         WebServices.loadProductContent { (error, jsonObjc) in
             if error == nil {
@@ -103,7 +110,6 @@ class FilterVC: UIViewController {
     }
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        self.rangeSlider.updateLayerFramesAndPositions()
 
     }
     
@@ -111,7 +117,21 @@ class FilterVC: UIViewController {
     // MARK: - Methods
     @objc func rangeSliderValueChanged() {
         
+        minBudgetLabel.text = "\(Int(sliderRange.lowerValue))"
+        maxBudgetLabel.text = "\(Int(sliderRange.upperValue))"
 
+        
+        if maxBudgetLabel.text == "2000" {
+            maxBudgetLabel.text = "∞"
+        }
+        
+
+    }
+    
+    @IBAction func SwappingBTN(_ sender: UIButton) {
+    
+        swappingIV.image = (swappingIV.image == UIImage(named: "Swapping") ? UIImage(named: "SwappingSelected") : UIImage(named: "Swapping"))
+        
     }
     
     @objc func getThreeCategory(_ notification: Notification) {
@@ -157,6 +177,7 @@ class FilterVC: UIViewController {
             heightTop.constant = 10
             labelHeightSize.constant = 15
             sizeView.isHidden = false
+            
         } else {
             sizeKam = 2 // Means show Size names
             heightSize.constant = 40
@@ -166,6 +187,7 @@ class FilterVC: UIViewController {
             
             sizeTitle.text = "Small "
             filterData.id_size = "1"
+            
         }
 
         
@@ -183,6 +205,7 @@ class FilterVC: UIViewController {
             filterData.id_size = val.1
             sizeTitle.text = val.0
         } else if val.2 == "3" {
+            leftFColorConst.constant = 35.0
             filterData.id_color1 = val.1
             firstColorTitle.text = val.0
             
@@ -192,6 +215,7 @@ class FilterVC: UIViewController {
         } else if val.2 == "4" {
             filterData.id_color2 = val.1
             secondColorTitle.text = val.0
+            leftAllConst.constant = 35.0
             
             secondColorView.isHidden = false
             secondColorView.backgroundColor = UIColor(hexString: val.4)
@@ -228,7 +252,7 @@ class FilterVC: UIViewController {
     
     func getSizeTypes() -> [(String , String)] {
         var items = [(String , String)]()
-        
+            
         if let brands = jsonObjct["size"].array {
             
             for brand in brands {
@@ -457,23 +481,32 @@ class FilterVC: UIViewController {
     }
     
     @IBAction func SelectLocation(_ sender: UIButton) {
-        let ChooseOtherNav = Initializer.createViewControllerWithId(storyBoardId: "ChooseOtherNav") as! UINavigationController
+      
+        locationVC = GovernmentVC.storyBoardInstance()!
         
-        if let chooseOtherVC = ChooseOtherNav.viewControllers[0] as? ChooseOtherVC {
+        locationVC?.governmentDelegate = self
+        
+        let governmentData = getGovernment()
+        if governmentData.count > 0 {
             
-            chooseOtherVC.type = 6
-            chooseOtherVC.frameTitle = "Choose Location"
-            chooseOtherVC.jsonObjec = jsonObjct["city"]
-            chooseOtherVC.tableData = getGovernment()
-            
-            self.present(ChooseOtherNav, animated: false, completion: nil)
+            locationVC?.showGovernmentData = governmentData
+            self.present(UINavigationController(rootViewController: locationVC!) , animated: true , completion: nil)
         }
     }
     
     @IBAction func FilterProducts(_ sender: UIButton) {
         
-        filterData.price_from = "\(Int(rangeSlider.lowerValue))"
-        filterData.price_to = "\(Int(rangeSlider.upperValue))"
+        filterData.price_from = minBudgetLabel.text!
+        filterData.price_to = maxBudgetLabel.text!
+
+        if maxBudgetLabel.text == "∞" {
+            filterData.price_to = "100000"
+            
+        }
+        
+        
+        
+        filterData.swap = (swappingIV.image == UIImage(named: "SwappingSelected") ? "1" : "-1")
         
         print(filterData.price_from)
         print(filterData.price_to)
@@ -490,6 +523,53 @@ class FilterVC: UIViewController {
         
         self.dismiss(animated: false, completion: nil)
         
+    }
+    
+}
+
+extension FilterVC: GovernmentCityDelegate {
+    
+    func didCancel() {
+        
+        print("Did Cancel")
+        locationVC?.dismiss(animated: true, completion: nil)
+    }
+    
+    func didOccursError(_ errorMsg: String) {
+        Helper.showErrorMessage(errorMsg, showOnTop: false)
+        locationVC?.dismiss(animated: true, completion: nil)
+    }
+    
+    func didSelectRow(_ rowData: (String, String) , _ time: Int) {
+        print(rowData)
+        print(time)
+
+        if time == 1 { // IF TIME is set to 1 --> Government ID
+            
+            filterData.id_government = rowData.1 // As Government id
+            locationTitle.text = rowData.0 // as Government  name
+            
+            // Try to fetch Which City
+            let cities = getCityByGovernment(governmentID: filterData.id_government)
+            
+            if cities.count > 0 {
+                locationVC?.showGovernmentData = cities
+                locationVC?.reloadTableViewData()
+                
+            } else {
+                locationVC?.dismiss(animated: true, completion: nil)
+            }
+            
+        } else {
+            
+            filterData.id_city = rowData.1 // as City ID
+            locationTitle.text = rowData.0 // as City name
+            
+            // Dismiss GovernmentVC
+            locationVC?.dismiss(animated: true, completion: nil)
+            
+        }
+
     }
     
 }

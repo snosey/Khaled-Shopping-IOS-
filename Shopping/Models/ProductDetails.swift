@@ -29,7 +29,7 @@ class ProductDetails {
     var swap = ""
     var view = ""
     var created_at = ""
-    var id_client = "" // M4 m7tago - l2 e7tgto b2a :""D
+    var id_client = "" 
     var countLove = ""
     var isLove = ""
     var review = ""

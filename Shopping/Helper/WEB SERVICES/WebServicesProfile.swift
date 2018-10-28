@@ -106,13 +106,15 @@ extension WebServices {
             "id_follower" : UserStatus.clientID
         ]
         
-        RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
+        // RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
+        
+        activityIndicatorView.startAnimation()
 
         Alamofire.request(Constants.Services.clientData, method: .get, parameters: parameters, encoding: URLEncoding.default, headers: nil)
         
             .responseJSON { (response) in
                 
-                RappleActivityIndicatorView.stopAnimation()
+                activityIndicatorView.stopAnimation()
                 
 
                 switch(response.result) {
@@ -155,13 +157,15 @@ extension WebServices {
             "state" : state
         ]
         
-        RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
+       // RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
+        
+        activityIndicatorView.startAnimation()
         
         Alamofire.request(Constants.Services.updateFollow, method: .get, parameters: parameters, encoding: URLEncoding.default, headers: nil)
         
             .responseJSON { (response) in
                 
-                RappleActivityIndicatorView.stopAnimation()
+                activityIndicatorView.stopAnimation()
                 
                 switch(response.result) {
                     
@@ -192,14 +196,16 @@ extension WebServices {
             "id_follower" : UserStatus.clientID
         ]
         
-        RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
+        // RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
+        
+        activityIndicatorView.startAnimation()
 
         Alamofire.request(Constants.Services.clientFollowing, method: .get, parameters: parameters, encoding: URLEncoding.default, headers: nil)
         
         
             .responseJSON { (response) in
                 
-                RappleActivityIndicatorView.stopAnimation()
+                activityIndicatorView.stopAnimation()
                 
                 switch(response.result) {
                     
@@ -246,13 +252,15 @@ extension WebServices {
             "id_follower" : UserStatus.clientID
         ]
         
-        RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
+        //RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
+        
+        activityIndicatorView.startAnimation()
         
         Alamofire.request(Constants.Services.clientFollowers, method: .get, parameters: parameters, encoding: URLEncoding.default, headers: nil)
             
             .responseJSON { (response) in
                 
-                RappleActivityIndicatorView.stopAnimation()
+                activityIndicatorView.stopAnimation()
                 
                 switch(response.result) {
                     
@@ -294,14 +302,15 @@ extension WebServices {
             "id_client" : idClient
         ]
         
-        RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
+        // RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
 
+        activityIndicatorView.startAnimation()
         
         Alamofire.request(Constants.Services.clientReviewData, method: .get, parameters: parameters, encoding: URLEncoding.default, headers: nil)
         
             .responseJSON { (response) in
                 
-                RappleActivityIndicatorView.stopAnimation()
+                activityIndicatorView.stopAnimation()
                 
                 switch(response.result) {
                     
@@ -334,13 +343,15 @@ extension WebServices {
             "id" : idComment
         ]
         
-        RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
+        // RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
+        
+        activityIndicatorView.startAnimation()
 
         Alamofire.request(Constants.Services.deleteReview, method: .get, parameters: parameters, encoding: URLEncoding.default, headers: nil)
         
             .responseJSON { (response) in
                 
-                RappleActivityIndicatorView.stopAnimation()
+                activityIndicatorView.stopAnimation()
                 
                 switch(response.result) {
                     
@@ -374,15 +385,16 @@ extension WebServices {
             "id_rate_client" : UserStatus.clientID
         ]
         
-        RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
+       // RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
         
+        activityIndicatorView.startAnimation()
         
         Alamofire.request(Constants.Services.addReview, method: .get, parameters: parameters, encoding: URLEncoding.default, headers: nil)
 
         
             .responseJSON { (response) in
                 
-                RappleActivityIndicatorView.stopAnimation()
+                activityIndicatorView.stopAnimation()
                 
                 switch (response.result) {
                     

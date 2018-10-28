@@ -99,23 +99,23 @@ extension MessagesVC: UITableViewDataSource {
             
             Helper.ImageViewCircle(imageView: imageView, 2.0)
             
-            (cell.viewWithTag(3) as! UILabel).text = tableData[indexPath.row].product_name
+            //(cell.viewWithTag(3) as! UILabel).text = tableData[indexPath.row].product_name
             
             (cell.viewWithTag(4) as! UILabel).text = Helper.getDay(tableData[indexPath.row].created_at)
             
             (cell.viewWithTag(9) as! UILabel).text = tableData[indexPath.row].message
             
-            let readNum = (cell.viewWithTag(5) as! UILabel)
+            // let readNum = (cell.viewWithTag(5) as! UILabel)
             
-            readNum.text = tableData[indexPath.row].unReed
-            Helper.roundCorners(view: readNum, cornerRadius: 5.0)
+            // readNum.text = tableData[indexPath.row].unReed
+            // Helper.roundCorners(view: readNum, cornerRadius: 5.0)
             
 
-            if tableData[indexPath.row].unReed == "0" {
-                readNum.isHidden = true
-            } else {
-                readNum.isHidden = false
-            }
+//            if tableData[indexPath.row].unReed == "0" {
+//                readNum.isHidden = true
+//            } else {
+//                readNum.isHidden = false
+//            }
             
             return cell
         }

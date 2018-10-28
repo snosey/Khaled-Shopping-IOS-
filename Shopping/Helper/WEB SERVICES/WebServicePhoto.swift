@@ -81,9 +81,19 @@ extension WebServices {
     
     /// NOT USED :"D
     class func downloadImage(name: String , completion: @escaping (_ success: Bool , _ image: UIImage?) -> Void) {
+        
+        let urlwithPercentEscapes = name.addingPercentEncoding( withAllowedCharacters: .urlQueryAllowed)
 
-        let url = URL(string: "\(Constants.Services.imagePath)\(name)")!
-     
+        
+        
+        guard let url = URL(string: "\(Constants.Services.imagePath)\(String(describing: urlwithPercentEscapes))") else {
+            
+            
+            completion(false , nil)
+            return
+        }
+        
+        
         Alamofire.request(url)
         
             .responseImage { (response) in
@@ -92,6 +102,7 @@ extension WebServices {
                     
                 case .failure(let err) :
                     print(err)
+                    
                     completion(false , nil)
                     
                 case .success(_ ) :

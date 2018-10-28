@@ -29,27 +29,37 @@ class ProfileVC: UIViewController {
     @IBAction func gotoProfileSetting(_ sender: Any) {
         
         
+        let clientProfileVC = Initializer.createViewControllerWithId(storyBoardId: "ClientProfileNav") as! UINavigationController
         
-        WebServices.getUserInfo { (success, userName , name , phone, logo, about)  in
-            if success {
-                
-                let ProfileSettingNav = Initializer.createViewControllerWithId(storyBoardId: Constants.StoryBoardID.ProfileSettingNav) as! UINavigationController
-                
-                if let profileSetting = ProfileSettingNav.viewControllers[0] as? ProfileSettingVC {
-                    
-                    profileSetting.userName = userName!
-                    profileSetting.name = name!
-                    profileSetting.phone = phone!
-                    profileSetting.logoText = logo!
-                    profileSetting.aboutus = about!
-                    
-                    self.present(ProfileSettingNav, animated: false, completion: nil)
-                }
-                
-            } else {
-                Helper.showErrorMessage("Error , Please try again!", showOnTop: false)
-            }
+        if let vc = clientProfileVC.viewControllers[0] as? ClientProfileVC {
+            vc.productOwnerID = UserStatus.clientID
+            vc.idOfClient = UserStatus.clientID
+            
+            self.present(clientProfileVC, animated: true , completion: nil)
         }
+        
+        
+        
+//        WebServices.getUserInfo { (success, userName , name , phone, logo, about)  in
+//            if success {
+//
+//                let ProfileSettingNav = Initializer.createViewControllerWithId(storyBoardId: Constants.StoryBoardID.ProfileSettingNav) as! UINavigationController
+//
+//                if let profileSetting = ProfileSettingNav.viewControllers[0] as? ProfileSettingVC {
+//
+//                    profileSetting.userName = userName!
+//                    profileSetting.name = name!
+//                    profileSetting.phone = phone!
+//                    profileSetting.logoText = logo!
+//                    profileSetting.aboutus = about!
+//
+//                    self.present(ProfileSettingNav, animated: false, completion: nil)
+//                }
+//
+//            } else {
+//                Helper.showErrorMessage("Error , Please try again!", showOnTop: false)
+//            }
+//        }
         
         
     }
@@ -76,8 +86,6 @@ class ProfileVC: UIViewController {
     }
     
     @IBAction func goToMyFavourites(_ sender: Any) {
-        
-
         
         let itemFavNav = Initializer.createViewControllerWithId(storyBoardId: Constants.StoryBoardID.ItemFavNav) as! UINavigationController
         

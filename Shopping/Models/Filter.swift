@@ -23,6 +23,7 @@ class Filter {
     var id_color2 = "-1"
     var id_government = "-1"
     var id_city = "-1"
+    var swap = "-1"
     // var user_id = ""
     
 }

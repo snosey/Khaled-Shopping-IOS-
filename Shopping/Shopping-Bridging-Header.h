@@ -8,4 +8,4 @@
 
 
 #import <GoogleSignIn/GoogleSignIn.h>
-#import <Google/SignIn.h>
+#import <Google/Core.h>

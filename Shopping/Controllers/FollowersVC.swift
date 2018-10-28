@@ -109,6 +109,13 @@ extension FollowersVC: UITableViewDataSource {
         
         if let cell = tableView.dequeueReusableCell(withIdentifier: "FollowersCell") as? FollowersCell {
             
+            if UserStatus.clientID == tableData[indexPath.row].4 {
+                
+                cell.followButton.isHidden = true
+                cell.followButton.isEnabled = false
+                
+            }
+            
             cell.followerName.text = tableData[indexPath.row].0
             cell.followerLogo.sd_setImage(with: URL(string: Helper.removeSpaceFromString("\(Constants.Services.imagePath)\(tableData[indexPath.row].1)")), placeholderImage: UIImage(named: "profile"))
             
@@ -135,5 +142,24 @@ extension FollowersVC: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 100.0
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        let ClientProfileNav = Initializer.createViewControllerWithId(storyBoardId: Constants.StoryBoardID.ClientProfileNav) as! UINavigationController
+        
+        
+        if let clientProfile = ClientProfileNav.viewControllers[0] as? ClientProfileVC {
+            
+            clientProfile.productOwnerID = tableData[indexPath.row].4
+            clientProfile.idOfClient = tableData[indexPath.row].4
+
+            //clientProfile.productOwnerID =  self.productDetails!.client_id_of_owner
+            // clientProfile.idOfClient = self.productDetails!.id_client
+            
+            
+            self.present(ClientProfileNav, animated: false, completion: nil)
+            
+        }
     }
 }

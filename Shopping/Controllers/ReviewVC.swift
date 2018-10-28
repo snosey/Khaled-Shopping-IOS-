@@ -22,6 +22,7 @@ class ReviewVC: UIViewController {
     @IBOutlet weak var star4: UIButton!
     @IBOutlet weak var star5: UIButton!
     
+    @IBOutlet weak var lastViewBottomC: NSLayoutConstraint!
     
     var tableData = [Review]() {
         didSet {
@@ -42,6 +43,15 @@ class ReviewVC: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
+        if idClient == UserStatus.clientID {
+            
+            
+            lastViewBottomC.constant = -50
+            
+        } else {
+            lastViewBottomC.constant = 0
+        }
+        
         
         WebServices.limit = 0
         WebServices.limitSearch = 0
@@ -59,12 +69,6 @@ class ReviewVC: UIViewController {
             }
         }
     }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-    
 
     @IBAction func postYourReview(_ sender: UIButton) {
    

@@ -53,6 +53,7 @@ class UpdateProductVC: UIViewController {
     @IBOutlet weak var heightTop: NSLayoutConstraint!
     @IBOutlet weak var labelHeightSize: NSLayoutConstraint!
     @IBOutlet weak var sizeView: UIView!
+    
     /*
      
      
@@ -154,6 +155,8 @@ class UpdateProductVC: UIViewController {
     func downloadImage(name: String)  {
         
         WebServices.downloadImage(name: Helper.removeSpaceFromString(name)) { (success, image) in
+            
+            
             if success {
                 
                 self.selectedImagesName.append(name)
@@ -263,6 +266,7 @@ class UpdateProductVC: UIViewController {
         } else {
             swappingImage.image = UIImage(named: "ic_unchecked")
         }
+        
     }
     
     @objc func getThreeCategory(_ notification: Notification) {
@@ -611,9 +615,6 @@ class UpdateProductVC: UIViewController {
             swappingImage.image = UIImage(named: "ic_unchecked")
             productModel!.swap = "0"
         }
-
-        
-        
     }
     
     @IBAction func EditProduct(_ sender: UIButton) {

@@ -34,7 +34,7 @@ class ProfileSettingVC: UIViewController  {
     @IBOutlet weak var aboutMeTF: SkyFloatingLabelTextField!
     
     @IBOutlet weak var widthImageView: NSLayoutConstraint!
-    
+
     
     // MARK: - Variables
     var logoText = ""

@@ -54,6 +54,7 @@ class ReviewCell: UITableViewCell {
             
             deleteButton.isHidden = false
             
+            
         } else {
             deleteButton.isHidden = true
         }

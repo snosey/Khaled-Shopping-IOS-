@@ -15,6 +15,9 @@ import RappleProgressHUD
 class ClientChatVC: UIViewController {
     
     
+    let activityIndicatorView = UINib(nibName: "ActivityIndicatorView", bundle: nil).instantiate(withOwner: nil, options: nil)[0] as! ActivityIndicatorView
+
+    
     var idClient = "" , ProfileTitle = "" , productID = "" , productImage = ""
     
     var tableData = [Message]() {
@@ -109,12 +112,16 @@ class ClientChatVC: UIViewController {
         print(logoText)
         print(newLogo )
         
-        RappleActivityIndicatorView.startAnimatingWithLabel("Loading...")
-
+        // RappleActivityIndicatorView.startAnimatingWithLabel("Loading...")
+        activityIndicatorView.startAnimation("Uploading Image ....")
+        
         WebServices.uploadImages(allImage: [(newLogo , logoText)]) { (success, str) in
             if success {
                 
-                RappleActivityIndicatorView.stopAnimation()
+               //  RappleActivityIndicatorView.stopAnimation()
+               
+                self.activityIndicatorView.stopAnimation()
+
                 WebServices.sendMessage(self.idClient, "\(self.logoText)" , self.productID) { (success, Msg) in
                     if success {
                         
@@ -157,6 +164,22 @@ class ClientChatVC: UIViewController {
         }
         
     }
+    
+    @IBAction func ToProductProfile(_ sender: UIButton) {
+        
+        let ProductNav = Initializer.createViewControllerWithId(storyBoardId: Constants.StoryBoardID.productProfileNav) as! UINavigationController
+        
+        
+        if let firstVC = ProductNav.viewControllers[0] as? ProductProfileVC {
+            
+            firstVC.productID = productID
+            firstVC.client_id_of_owner = idClient
+            
+            self.present(ProductNav, animated: false, completion: nil)
+        }
+        
+    }
+    
     
     
     @IBAction func handleCamera(_ sender: UIButton) {
@@ -201,6 +224,8 @@ class ClientChatVC: UIViewController {
         
     }
     
+    
+    
     @IBAction func fullScreenReciever(_ sender: UIButton) {
         
         if let cellView = sender.superview {
@@ -232,12 +257,12 @@ extension ClientChatVC: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-
+        
         if checkIfMessageImage(tableData[indexPath.row].message) {
-            
+
             return 150.0
         }
-        
+
         return UITableViewAutomaticDimension
     }
 
@@ -286,8 +311,31 @@ extension ClientChatVC: UITableViewDataSource {
             } else if let cell = tableView.dequeueReusableCell(withIdentifier: "senderImageCell"){
                 
                 let imageView = cell.viewWithTag(5) as! UIImageView
-            
-                imageView.sd_setImage(with: URL(string: Helper.removeSpaceFromString(("\(Constants.Services.imagePath)\(tableData[indexPath.row].message)"))), placeholderImage: UIImage(named: "loading")!)
+                
+                
+                imageView.sd_setImage(with: URL(string: Helper.removeSpaceFromString(("\(Constants.Services.imagePath)\(tableData[indexPath.row].message)"))), placeholderImage:  UIImage(named: "loading")!, progress: { (int1Fi, int2Fi, url) in
+                    
+                }) { (image1, error, cacheType, url) in
+                    
+                    if error == nil {
+                    
+                        
+                        // let constWidth = NSLayoutConstraint(item: imageView, attribute: NSLayoutAttribute.width, relatedBy: NSLayoutRelation.equal, toItem: nil, attribute: NSLayoutAttribute.notAnAttribute, multiplier: 1.0, constant: image1!.size.width)
+                            
+                        let constHeight = NSLayoutConstraint(item: imageView, attribute: NSLayoutAttribute.height, relatedBy: NSLayoutRelation.equal, toItem: nil, attribute: NSLayoutAttribute.notAnAttribute, multiplier: 1.0, constant: image1!.size.height)
+
+                        // imageView.addConstraint(constWidth)
+                        imageView.addConstraint(constHeight)
+                        
+                        imageView.contentMode = .scaleAspectFill
+                        
+                    } else {
+                        
+                        
+                        
+                    }
+                    
+                }
                 
             
                 Helper.roundCorners(view: imageView, cornerRadius: 5.0)
@@ -308,8 +356,6 @@ extension ClientChatVC: UITableViewDataSource {
                 
                 
                 print(tableData[indexPath.row].message)
-                
-                
                 
                 
                 cell.MessageText.text = tableData[indexPath.row].message
@@ -385,7 +431,8 @@ extension ClientChatVC: UIImagePickerControllerDelegate , UINavigationController
             let result = PHAsset.fetchAssets(withALAssetURLs: [imageURL], options: nil)
             let asset = result.firstObject
             
-            let file = getNameWithoutExtension(name: asset!.value(forKey: "filename") as! String)
+            let file = getNameWithoutExtension(name: asset?.value(forKey: "filename") as? String ?? "IMAGE\(Int(arc4random_uniform(1000) + 1)).jpg")
+            
             let fileName = file.0
             let exten = file.1
             

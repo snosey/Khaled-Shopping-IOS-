@@ -16,8 +16,9 @@ extension WebServices {
     // MARK: - Login
     class func login(userName: String , password: String , completion: @escaping (_ success: Bool , _ Msg: String?) -> Void) {
         
-        RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
+        // RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
         
+        activityIndicatorView.startAnimation()
         
         let parameters = [
             "username" : userName ,
@@ -28,7 +29,7 @@ extension WebServices {
             
             .responseJSON { (response) in
                 
-                RappleActivityIndicatorView.stopAnimation()
+                activityIndicatorView.stopAnimation()
                 
                 
                 switch(response.result) {
@@ -84,13 +85,15 @@ extension WebServices {
             "email" : email
         ]
         
-        RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
+        // RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
+        
+        activityIndicatorView.startAnimation()
         
         Alamofire.request(Constants.Services.forgetPassword, method: .get, parameters: parameters, encoding: URLEncoding.default, headers: nil)
             
             
             .responseJSON { (response) in
-                RappleActivityIndicatorView.stopAnimation()
+                activityIndicatorView.stopAnimation()
                 
                 switch(response.result){
                     
@@ -121,13 +124,15 @@ extension WebServices {
             "password" : passWord
         ]
         
-        RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
+        // RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
+        
+        activityIndicatorView.startAnimation()
         
         Alamofire.request(Constants.Services.signUp , method: .get, parameters: parameters, encoding: URLEncoding.default, headers: nil)
             
             .responseJSON { (response) in
                 
-                RappleActivityIndicatorView.stopAnimation()
+                activityIndicatorView.stopAnimation()
                 
                 switch(response.result) {
                     

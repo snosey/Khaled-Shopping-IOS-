@@ -90,6 +90,9 @@ class AddProductVC: UIViewController {
     var sizeKam = 0 // ZERO means hide , ONE means numbers , TWO means مقاسات
     var totalCount = 0
     
+    var locationVC = GovernmentVC.storyBoardInstance()
+
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -207,8 +210,7 @@ class AddProductVC: UIViewController {
     
         Helper.ImageViewCircle(imageView: firstColorView, 2.0)
         Helper.ImageViewCircle(imageView: secondColorView, 2.0)
-        firstColorView.isHidden = true
-        secondColorView.isHidden = true
+
         Helper.roundCorners(view:categoryButton , cornerRadius: 10.0)
         
         descriptionTV.textColor = UIColor.lightGray
@@ -283,15 +285,15 @@ class AddProductVC: UIViewController {
             destVC.frameTitle = "Choose Condition"
             destVC.type = 5
         }
-        
+        /*
         if segue.identifier == "location" {
-            let destVC = segue.destination as! DropDownVC
-            destVC.tableData = getGovernment()
-            destVC.frameTitle = "Choose Location"
-            destVC.jsonObjec = jsonObject["city"]
-            destVC.type = 6
+//            let destVC = segue.destination as! DropDownVC
+//            destVC.tableData = getGovernment()
+//            destVC.frameTitle = "Choose Location"
+//            destVC.jsonObjec = jsonObject["city"]
+//            destVC.type = 6
         }
-        
+        */
     }
     
     func getBrandTypes() -> [(String , String)] {
@@ -449,7 +451,24 @@ class AddProductVC: UIViewController {
             swapingImageView.image = UIImage(named: "ic_unchecked")
             AddProductModel.swap = "0"
         }
+        
     }
+    
+    @IBAction func SelectLocation(_ sender: UIButton) {
+        
+        locationVC = GovernmentVC.storyBoardInstance()!
+        
+        locationVC?.governmentDelegate = self
+        
+        let governmentData = getGovernment()
+        if governmentData.count > 0 {
+            
+            locationVC?.showGovernmentData = governmentData
+            self.present(UINavigationController(rootViewController: locationVC!) , animated: true , completion: nil)
+        }
+        
+    }
+    
     
     @IBAction func addProduct(_ sender: UIButton) {
         
@@ -475,7 +494,7 @@ class AddProductVC: UIViewController {
             return
         }
         
-        if AddProductModel.id_city == "" {
+        if AddProductModel.id_government == "" {
             Helper.showErrorMessage("You must choose location!", showOnTop: false)
             return
         }
@@ -485,7 +504,6 @@ class AddProductVC: UIViewController {
         
         AddProductModel.title = title
         AddProductModel.price = price
-        
         
         if collectionData.count >= 1 {
             AddProductModel.img1 = collectionData[0].1
@@ -688,4 +706,52 @@ extension AddProductVC: OpalImagePickerControllerDelegate {
         return (output  , exten)
     }
 
+}
+
+
+extension AddProductVC: GovernmentCityDelegate {
+    
+    func didCancel() {
+        
+        print("Did Cancel")
+        locationVC?.dismiss(animated: true, completion: nil)
+    }
+    
+    func didOccursError(_ errorMsg: String) {
+        Helper.showErrorMessage(errorMsg, showOnTop: false)
+        locationVC?.dismiss(animated: true, completion: nil)
+    }
+    
+    func didSelectRow(_ rowData: (String, String) , _ time: Int) {
+        print(rowData)
+        print(time)
+        
+        if time == 1 { // IF TIME is set to 1 --> Government ID
+            
+            AddProductModel.id_government = rowData.1 // As Government id
+            location.text = rowData.0 // as Government  name
+            
+            // Try to fetch Which City
+            let cities = getCityByGovernment(governmentID: AddProductModel.id_government)
+            
+            if cities.count > 0 {
+                locationVC?.showGovernmentData = cities
+                locationVC?.reloadTableViewData()
+                
+            } else {
+                locationVC?.dismiss(animated: true, completion: nil)
+            }
+            
+        } else {
+            
+            AddProductModel.id_city = rowData.1 // as City ID
+            location.text = rowData.0 // as City name
+            
+            // Dismiss GovernmentVC
+            locationVC?.dismiss(animated: true, completion: nil)
+            
+        }
+        
+    }
+    
 }

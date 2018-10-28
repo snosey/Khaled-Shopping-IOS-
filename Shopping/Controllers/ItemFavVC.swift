@@ -14,9 +14,11 @@ class ItemFavVC: UIViewController {
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var emptyView: UIView!
     
+    @IBOutlet weak var backBTN: UIBarButtonItem!
     
     var itemOrFav: Int = 1 , isLoading = false , lastCellIndex = -1
-    
+    var lastY: CGFloat = 0.0
+
     var collectionData = [Product]()
     
     override func viewDidLoad() {
@@ -29,11 +31,24 @@ class ItemFavVC: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
+        if self.tabBarController?.selectedIndex == 1 {
+
+            self.backBTN.image = nil
+            
+            self.itemOrFav = 2
+            WebServices.limitFavProduct = 0
+
+           
+            
+        }
+        
         WebServices.limit = 0
         WebServices.limitSearch = 0
         WebServices.limitFavProduct = 0
         WebServices.limitClientProduct = 0
         WebServices.limitSimilarProduct = 0
+        
+        collectionView.bounces = false
 
         isLoading = false
         lastCellIndex = -1
@@ -145,17 +160,35 @@ class ItemFavVC: UIViewController {
 
 extension ItemFavVC: UICollectionViewDelegateFlowLayout {
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
         
-        var width = (UIScreen.main.bounds.width - 20.0) / 2
+        let currentY = scrollView.contentOffset.y
+        let currentBottomY = scrollView.frame.size.height + currentY
+        if currentY > lastY {
+            //"scrolling down"
+            collectionView.bounces = true
+        } else {
+            //"scrolling up"
+            // Check that we are not in bottom bounce
+            if currentBottomY < scrollView.contentSize.height + scrollView.contentInset.bottom {
+                collectionView.bounces = false
+            }
+        }
+        lastY = scrollView.contentOffset.y
         
-        width = width > 200.0 ? 200.0 : width
-        
-        let const: CGFloat = (itemOrFav == 1 ? 1.5 : 1.8)
-        
-        return CGSize(width: width, height: (width * const))
     }
     
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+
+        var width = (self.collectionView.frame.width - 8.0) / 2
+
+        width = width > 200.0 ? 200.0 : width
+
+        let const: CGFloat = (itemOrFav == 1 ? 1.8 : 2.0)
+
+        return CGSize(width: width, height: (width * const))
+    }
+
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         
         let currentData = collectionData.count

@@ -23,6 +23,7 @@ class Product {
     var size_number = ""
     var name = ""
     var logo = ""
+    var swap = ""
     
     init(json: JSON) {
         if let id = json["id"].string { self.id = id }
@@ -34,7 +35,9 @@ class Product {
         if let brand = json["brand"].string { self.brand = brand }
         if let size = json["size"].string { self.size = size }
         if let size_number = json["size_number"].string { self.size_number = size_number }
-        if let name = json["name"].string { self.name = name }
+        if let name = json["username"].string { self.name = name }
+        else if let name = json["name"].string { self.name = name }
         if let logo = json["logo"].string { self.logo = logo }
+        if let swap = json["swap"].string { self.swap = swap }
     }
 }

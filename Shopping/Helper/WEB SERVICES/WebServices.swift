@@ -13,6 +13,9 @@ import SwiftyJSON
 
 class WebServices {
     
+    static let activityIndicatorView = UINib(nibName: "ActivityIndicatorView", bundle: nil).instantiate(withOwner: nil, options: nil)[0] as! ActivityIndicatorView
+
+    
     // MARK: - Stored Properties
     static var limit = 0 // used in getAllProduct
     static var limitClientProduct = 0 // used in getClientProduct
@@ -49,13 +52,15 @@ class WebServices {
             "img5" : addProduct.img5 ,
         ]
         
-        RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
+        // RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
+        
+        activityIndicatorView.startAnimation()
         
         Alamofire.request(Constants.Services.addProduct, method: .get, parameters: parameters, encoding: URLEncoding.default, headers: nil)
         
             .responseJSON { (response) in
                 
-                RappleActivityIndicatorView.stopAnimation()
+                activityIndicatorView.stopAnimation()
                 
                 switch(response.result) {
                     
@@ -74,14 +79,15 @@ class WebServices {
     // MARK: - Get Category
     class func loadProductContent(completion: @escaping (_ err: Error? , _ json: JSON?) -> Void ) {
         
-        RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
+        // RappleActivityIndicatorView.startAnimatingWithLabel("Loading...", attributes: RappleModernAttributes)
         
+        activityIndicatorView.startAnimation()
 
         Alamofire.request(Constants.Services.productContentData, method: .get, parameters: nil, encoding: URLEncoding.default, headers: nil)
         
             .responseJSON { (response) in
                 
-                RappleActivityIndicatorView.stopAnimation()
+                activityIndicatorView.stopAnimation()
                 
                 switch(response.result) {
                     
